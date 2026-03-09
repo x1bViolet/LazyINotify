@@ -13,9 +13,9 @@
     <PackageTags>INotifyPropertyChanging;INotifyPropertyChanged;NotifyPropertyGetting;INotify;MVVM;DataBinding</PackageTags>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <PackageReleaseNotes>Added XML annotations</PackageReleaseNotes>
+    <PackageReleaseNotes>Improved some XML Annotations</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

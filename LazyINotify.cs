@@ -8,18 +8,28 @@ namespace LazyINotifyLib
     namespace Miscellaneous
     {
         /// <summary>
-        /// Specifies the default value for a property to create it via <see cref="Activator.CreateInstance(Type)"/> / <see cref="Activator.CreateInstance(Type, object?[]?)"/> from <see cref="LazyINotify"/> constructor.
+        /// Specifies the default value for a property to create it via <see cref="Activator.CreateInstance(Type)"/> / <see cref="Activator.CreateInstance(Type, object[])"/> from <see cref="LazyINotify"/> constructor.
         /// </summary>
+        /// <param name="ConstructorArguments">
+        /// Constructor arguments that will be passed as the second argument to <see cref="Activator.CreateInstance(Type, object[])"/>.
+        /// <br/><br/>
+        /// If this value is null, the <see cref="Activator.CreateInstance(Type)"/> method will be used instead.
+        /// </param>
         [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
         public class NewInstanceAsDefaultValueAttribute(object?[]? ConstructorArguments = null) : Attribute
         {
+            /// <summary>
+            /// Constructor arguments that will be passed as the second argument to <see cref="Activator.CreateInstance(Type, object[])"/>.
+            /// <br/><br/>
+            /// If this value is null, the <see cref="Activator.CreateInstance(Type)"/> method will be used instead.
+            /// </summary>
             public object?[]? ConstructorArgsuments { get; } = ConstructorArguments;
         }
 
         /// <summary>
-        /// Used by <see cref="NotifyGet"/> and <see cref="NotifySet"/> to modify the output/input value.
+        /// Used by <see cref="LazyINotify.NotifyGet"/> and <see cref="LazyINotify.NotifySet"/> to modify the output/input value.
         /// <br/><br/>
-        /// Code block from <see cref="NotifyGet"/> with actual usage when returning stored property value (ValueFormatting returns a possibly modified value):
+        /// Code block from <see cref="LazyINotify.NotifyGet"/> with actual usage when returning stored property value (ValueFormatting returns a possibly modified value):
         /// <code>return ValueFormatting != null ? ValueFormatting(PropertyName, ReturnValue) : ReturnValue</code>
         /// </summary>
         public delegate object? ValueFormattingInstructor(string PropertyName, object? OriginalValue);
@@ -49,11 +59,11 @@ namespace LazyINotifyLib
         /// <summary>
         /// Provides data for the <see cref="INotifyPropertyGetting.PropertyGetting"/> event.
         /// </summary>
-        /// <param name="PropertyName">The name of the property whose value is being getted</param>
+        /// <param name="PropertyName">The name of the property whose value is being getted.</param>
         public class PropertyGettingEventArgs(string? PropertyName) : EventArgs
         {
             /// <summary>
-            /// The name of the property whose value is being getted
+            /// The name of the property whose value is being getted.
             /// </summary>
             public virtual string? PropertyName { get; } = PropertyName;
         }
@@ -64,7 +74,7 @@ namespace LazyINotifyLib
 
 
     /// <summary>
-    /// • Implements <see cref="INotifyPropertyChanged.PropertyChanged"/> and <see cref="INotifyPropertyChanging.PropertyChanging"/> features through alt <see langword="set"/> accessor (Plus custom <see cref="Miscellaneous.INotifyPropertyGetting"/> for <see langword="get"/>).<br/>
+    /// • Implements <see cref="INotifyPropertyChanged.PropertyChanged"/> and <see cref="INotifyPropertyChanging.PropertyChanging"/> features through alt <see langword="set"/> accessor (Plus custom <see cref="INotifyPropertyGetting"/> for <see langword="get"/>).<br/>
     /// • Usage: <c>{ get => NotifyGet(); set => NotifySet(value); }</c><br/>
     /// (<see cref="NotifySet"/> invokes <see cref="PropertyChanging"/> and <see cref="PropertyChanged"/> <see langword="events"/>, and stores property value internally)<br/>
     /// (<see cref="NotifyGet"/> invokes <see cref="PropertyGetting"/> and returns value stored by <c>NotifySet</c>, otherwise default for property type if value is not set (<see langword="null"/> / <see cref="Activator.CreateInstance(Type)"/>))
@@ -72,7 +82,7 @@ namespace LazyINotifyLib
     /// • <see cref="ValueFormattingInstructor"/> <see langword="delegate"/> at the <c>NotifyGet</c> or <c>NotifySet</c> methods can change out/in value on <see langword="get"></see>/<see langword="set"/>.
     /// <br/><br/>
     /// • Use <see cref="DefaultValueAttribute"/> to set default value for properties with this advanced <see langword="get"/> and <see langword="set"/>.<br/>
-    /// • Use <see cref="NewInstanceAsDefaultValueAttribute"/> to set <see langword="new"/>() as default value (Available with constructor args via <see langword="params"/> <see langword="object"/>[] args for Attribute).
+    /// • Use <see cref="NewInstanceAsDefaultValueAttribute"/> to set <see langword="new"/>() as default value (Available with constructor args via <see langword="params"/> <see langword="object"/>?[]? args for Attribute).
     /// </summary>
     public abstract class LazyINotify : INotifyPropertyChanging, INotifyPropertyChanged, INotifyPropertyGetting
     {
@@ -88,6 +98,7 @@ namespace LazyINotifyLib
 
 
 
+        #pragma warning disable CS1591
         public event PropertyGettingEventHandler? PropertyGetting;
         public event PropertyChangingEventHandler? PropertyChanging;
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -95,6 +106,7 @@ namespace LazyINotifyLib
         public void OnPropertyGetting([CallerMemberName] string PropertyName = "") => PropertyGetting?.Invoke(this, new PropertyGettingEventArgs(PropertyName));
         public void OnPropertyChanging([CallerMemberName] string PropertyName = "") => PropertyChanging?.Invoke(this, new PropertyChangingEventArgs(PropertyName));
         public void OnPropertyChanged([CallerMemberName] string PropertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(PropertyName));
+        #pragma warning restore CS1591
 
 
 
@@ -126,9 +138,9 @@ namespace LazyINotifyLib
         }
 
         /// <summary>
-        /// Uses <see cref="CallerMemberNameAttribute"/> for <paramref name="PropertyName"/>
+        /// Uses <see cref="CallerMemberNameAttribute"/> for <paramref name="PropertyName"/>.
         /// <br/><br/>
-        /// Invoking <see cref="PropertyGetting"/> before <see langword="return"/>.
+        /// Invoking <see cref="PropertyGetting"/> before value <see langword="return"/>.
         /// </summary>
         protected dynamic? NotifyGet(ValueFormattingInstructor? ValueFormatting = null, [CallerMemberName] string PropertyName = "")
         {
@@ -152,14 +164,14 @@ namespace LazyINotifyLib
         /// <summary>
         /// Determines which access level properties should be considered when creating the internal dictionary of properties accessible by <see cref="NotifyGet"/> / <see cref="NotifySet"/>.
         /// <br/><br/>
-        /// Default value is <see cref="BindingFlags.Public"/> | <see cref="BindingFlags.NonPublic"/> | <see cref="BindingFlags.Instance"/> | <see cref="BindingFlags.Static"/> (Means <see langword="public"/> / <see langword="private"/> / <see langword="protected"/>).
+        /// Default value is <c><see cref="BindingFlags.Public"/> | <see cref="BindingFlags.NonPublic"/> | <see cref="BindingFlags.Instance"/> | <see cref="BindingFlags.Static"/></c> (Means <see langword="public"/> / <see langword="private"/> / <see langword="protected"/>).
         /// </summary>
         protected virtual BindingFlags PropertyAcknowledgementLevel => BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
 
 
 
         /// <summary>
-        /// Constructor sets default property values via <see cref="DefaultValueAttribute"/> or <see cref="NewInstanceAsDefaultValueAttribute"/> attributes
+        /// Constructor sets default property values via <see cref="DefaultValueAttribute"/> or <see cref="NewInstanceAsDefaultValueAttribute"/> attributes and creates internal <see cref="LazyINotify__ThisProperties"/> dictionary based on <see cref="PropertyAcknowledgementLevel"/>.
         /// </summary>
         public LazyINotify()
         {
