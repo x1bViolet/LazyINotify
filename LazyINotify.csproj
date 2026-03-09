@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Title>LazyINotify</Title>
+    <Description>An abstract class implementing the INotifyPropertyChanging and INotifyPropertyChanged interfaces via specialized get/set accessors.</Description>
+    <Authors>x1bViolet</Authors>
+    <PackageProjectUrl>https://github.com/x1bViolet/LazyINotify</PackageProjectUrl>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <RepositoryUrl>https://github.com/x1bViolet/LazyINotify</RepositoryUrl>
+    <PackageTags>INotifyPropertyChanging;INotifyPropertyChanged;NotifyPropertyGetting;INotify;MVVM;DataBinding</PackageTags>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Version>1.0.1</Version>
+    <PackageReleaseNotes>Removed forgotten logging of recognized property names from the LazyINotify class constructor</PackageReleaseNotes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Update="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>
