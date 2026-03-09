@@ -15,7 +15,7 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <Version>1.0.2</Version>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <PackageReleaseNotes>Removed forgotten logging of recognized property names from the LazyINotify class constructor</PackageReleaseNotes>
+    <PackageReleaseNotes>Added XML annotations</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
